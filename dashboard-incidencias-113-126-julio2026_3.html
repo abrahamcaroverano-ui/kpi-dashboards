@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Incidencias · Delegaciones 113 y 126 · Julio 2026</title>
+<style>
+  :root{
+    --navy:#0B2447;
+    --blue:#00A6E7;
+    --coral:#EB235A;
+    --green:#1FAA59;
+    --amber:#F2A93B;
+    --grey-bg:#F4F6F9;
+    --grey-border:#E3E7EE;
+    --grey-text:#5B6472;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--grey-bg);
+    color:var(--navy);
+  }
+  header{
+    background:linear-gradient(135deg, var(--navy) 0%, #123566 100%);
+    color:#fff;
+    padding:28px 40px;
+  }
+  header h1{
+    margin:0 0 4px 0;
+    font-size:26px;
+    font-weight:700;
+  }
+  header p{
+    margin:0;
+    color:#B9C6DC;
+    font-size:14px;
+  }
+  .tabs{
+    display:flex;
+    gap:8px;
+    padding:20px 40px 0 40px;
+    background:var(--grey-bg);
+  }
+  .tab-btn{
+    border:none;
+    padding:12px 26px;
+    font-size:15px;
+    font-weight:600;
+    border-radius:10px 10px 0 0;
+    cursor:pointer;
+    background:#E3E7EE;
+    color:var(--grey-text);
+    transition:all .15s ease;
+  }
+  .tab-btn.active{
+    background:#fff;
+    color:var(--navy);
+    box-shadow:0 -2px 8px rgba(11,36,71,.08);
+  }
+  .tab-btn .dot{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:50%;
+    margin-right:8px;
+  }
+  main{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 40px 60px 40px;
+  }
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    margin:24px 0 32px 0;
+  }
+  .kpi-card{
+    background:#fff;
+    border:1px solid var(--grey-border);
+    border-radius:14px;
+    padding:20px;
+  }
+  .kpi-card .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--grey-text);
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .kpi-card .value{
+    font-size:30px;
+    font-weight:800;
+    color:var(--navy);
+  }
+  .kpi-card .sub{
+    font-size:13px;
+    margin-top:6px;
+    font-weight:600;
+  }
+  .sub.up{ color:var(--coral); }
+  .sub.down{ color:var(--green); }
+  .sub.neutral{ color:var(--grey-text); }
+
+  .semaforo{
+    display:inline-block;
+    width:10px;height:10px;
+    border-radius:50%;
+    margin-right:6px;
+  }
+
+  section.card{
+    background:#fff;
+    border:1px solid var(--grey-border);
+    border-radius:14px;
+    padding:24px 28px;
+    margin-bottom:24px;
+  }
+  section.card h2{
+    margin:0 0 4px 0;
+    font-size:18px;
+    color:var(--navy);
+  }
+  section.card p.desc{
+    margin:0 0 20px 0;
+    color:var(--grey-text);
+    font-size:13px;
+  }
+
+  .bar-row{
+    display:flex;
+    align-items:center;
+    margin-bottom:14px;
+    gap:14px;
+  }
+  .bar-label{
+    width:290px;
+    font-size:13px;
+    color:var(--navy);
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .bar-track{
+    flex:1;
+    background:#EEF1F6;
+    border-radius:8px;
+    height:22px;
+    overflow:hidden;
+    position:relative;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:8px;
+    background:linear-gradient(90deg, var(--blue), var(--navy));
+  }
+  .bar-value{
+    width:130px;
+    text-align:right;
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy);
+    flex-shrink:0;
+  }
+  .bar-pct{
+    color:var(--grey-text);
+    font-weight:500;
+    font-size:12px;
+  }
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1.3fr .7fr;
+    gap:20px;
+  }
+  table.compare{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.compare th{
+    text-align:left;
+    padding:10px 12px;
+    background:var(--navy);
+    color:#fff;
+    font-weight:600;
+  }
+  table.compare th:not(:first-child){ text-align:right; }
+  table.compare td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--grey-border);
+  }
+  table.compare td:not(:first-child){ text-align:right; font-variant-numeric:tabular-nums;}
+  table.compare tr:last-child td{ border-bottom:none; font-weight:700; background:#F7F9FC;}
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:20px;
+    color:#fff;
+  }
+  .tag.peor{ background:var(--coral); }
+  .tag.mejor{ background:var(--green); }
+
+  .actions{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .actions li{
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--grey-border);
+    font-size:14px;
+  }
+  .actions li:last-child{ border-bottom:none; }
+  .prio{
+    flex-shrink:0;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .prio.alta{ background:var(--coral); }
+  .prio.media{ background:var(--amber); }
+
+  .msg-box{
+    background:#F7F9FC;
+    border-left:4px solid var(--blue);
+    border-radius:8px;
+    padding:18px 20px;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--navy);
+    white-space:pre-line;
+  }
+  .footer-note{
+    font-size:12px;
+    color:var(--grey-text);
+    text-align:center;
+    margin-top:20px;
+  }
+  .note-est{
+    font-size:11px;
+    color:var(--grey-text);
+    font-style:italic;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Dashboard de Incidencias · Julio 2026</h1>
+  <p>Delegaciones 113 (Cádiz - Jerez) y 126 (Cádiz - Chiclana) · Team Leader: Abraham Caro Verano · Fuente: Gestión Incidencias JULIO 2026</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="113" onclick="showTab('113')"><span class="dot" style="background:var(--blue)"></span>Delegación 113 · Jerez</button>
+  <button class="tab-btn" data-tab="126" onclick="showTab('126')"><span class="dot" style="background:var(--coral)"></span>Delegación 126 · Chiclana</button>
+  <button class="tab-btn" data-tab="comp" onclick="showTab('comp')"><span class="dot" style="background:var(--navy)"></span>Comparativa 113 vs 126</button>
+  <button class="tab-btn" data-tab="rutas" onclick="showTab('rutas')"><span class="dot" style="background:var(--amber)"></span>Por Ruta y Repartidor</button>
+</div>
+
+<main>
+
+<!-- ===================== PANEL 113 ===================== -->
+<div class="panel active" id="panel-113">
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="label">Albaranes entregados</div>
+      <div class="value">16.495</div>
+      <div class="sub neutral">Julio 2026</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Incidencias totales</div>
+      <div class="value">424</div>
+      <div class="sub up">2,57% sobre albaranes</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Vs. media nacional (1,81%)</div>
+      <div class="value" style="color:var(--coral)">+0,76 pp</div>
+      <div class="sub up"><span class="semaforo" style="background:var(--coral)"></span>Por encima del objetivo</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Incidencia top</div>
+      <div class="value" style="font-size:18px; line-height:1.3;">Incumplimiento ruta</div>
+      <div class="sub up">171 casos · 40% del total</div>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Incidencias por tipología</h2>
+    <p class="desc">Número de casos y % sobre albaranes entregados en julio 2026 — Delegación 113</p>
+
+    <div class="bar-row">
+      <div class="bar-label">5 · Incumplimiento ruta programada</div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%; background:linear-gradient(90deg,var(--coral),#B71640)"></div></div>
+      <div class="bar-value">171 <span class="bar-pct">(1,04%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">13 · Error entrega / recogida</div>
+      <div class="bar-track"><div class="bar-fill" style="width:41.5%"></div></div>
+      <div class="bar-value">71 <span class="bar-pct">(0,43%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">15 · Error confirmación albarán</div>
+      <div class="bar-track"><div class="bar-fill" style="width:40.3%"></div></div>
+      <div class="bar-value">69 <span class="bar-pct">(0,42%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">25 · Entrega puerta sin llamar</div>
+      <div class="bar-track"><div class="bar-fill" style="width:24%"></div></div>
+      <div class="bar-value">41 <span class="bar-pct">(0,25%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">23 · Entrega en calle</div>
+      <div class="bar-track"><div class="bar-fill" style="width:22.2%"></div></div>
+      <div class="bar-value">38 <span class="bar-pct">(0,23%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">11 · Aviso Agua +48h</div>
+      <div class="bar-track"><div class="bar-fill" style="width:15.8%"></div></div>
+      <div class="bar-value">27 <span class="bar-pct">(0,16%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">27 · Prime - no cumple horario</div>
+      <div class="bar-track"><div class="bar-fill" style="width:2.9%"></div></div>
+      <div class="bar-value">5 <span class="bar-pct">(0,03%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">24 · Producto en mal estado</div>
+      <div class="bar-track"><div class="bar-fill" style="width:1.2%"></div></div>
+      <div class="bar-value">2 <span class="bar-pct">(0,01%)</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Problemas detectados</h2>
+    <ul class="actions">
+      <li><span class="prio alta">!</span><div><b>Incumplimiento de ruta programada dispara la tasa.</b> Es el 40% de toda la incidencia de la delegación (171 de 424) y por sí solo ya supera la media nacional de errores totales (1,04% vs 1,81% global). Es la causa que más aleja a 113 del objetivo.</div></li>
+      <li><span class="prio media">!</span><div><b>Errores de entrega/recogida y confirmación de albarán van juntos.</b> Entre ambos suman 140 casos (33%) — suele indicar prisa en ruta o mala verificación en el momento de la entrega.</div></li>
+      <li><span class="prio media">!</span><div><b>Entregas sin llamar o en calle</b> suman 79 casos (19%) — síntoma de protocolo de entrega no respetado en puerta.</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Acciones concretas a aplicar</h2>
+    <ul class="actions">
+      <li><span class="prio alta">1</span><div><b>Auditar las rutas con más incumplimientos.</b> Cruza los 171 casos de "incumplimiento ruta" por repartidor/ruta para ver si se concentran en 2-3 rutas o repartidores concretos, y actúa ahí primero.</div></li>
+      <li><span class="prio alta">2</span><div><b>Reforzar el protocolo de confirmación de albarán en el momento de la entrega</b> (foto/firma antes de salir del domicilio) para bajar los 69 casos de error de confirmación.</div></li>
+      <li><span class="prio media">3</span><div><b>Recordatorio de protocolo "llamar antes de dejar en puerta o calle"</b> en la próxima reunión de equipo — objetivo: bajar de 79 a menos de 40 casos/mes.</div></li>
+      <li><span class="prio media">4</span><div><b>Seguimiento semanal del indicador</b> (no solo mensual) para detectar desviaciones antes de que se acumulen.</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Mensaje para el equipo</h2>
+    <div class="msg-box">Equipo, en julio hemos cerrado con una tasa de incidencias del 2,57% en la 113, por encima de la media de la compañía (1,81%).
+
+El mayor peso está en incumplimientos de ruta programada (171 casos) y en errores de entrega/confirmación de albarán (140 casos entre los dos).
+
+Vamos a centrarnos este mes en dos cosas muy concretas: cumplir la ruta tal y como está programada, y confirmar bien el albarán antes de salir del domicilio del cliente. Son detalles que dependen de nosotros y que se notan directamente en la satisfacción del cliente.
+
+Contad conmigo para lo que necesitéis en ruta. Vamos a revertir esta tendencia entre todos.</div>
+  </section>
+</div>
+
+<!-- ===================== PANEL 126 ===================== -->
+<div class="panel" id="panel-126">
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="label">Albaranes entregados</div>
+      <div class="value">13.901</div>
+      <div class="sub neutral">Julio 2026</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Incidencias totales</div>
+      <div class="value">255</div>
+      <div class="sub up">1,83% sobre albaranes</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Vs. media nacional (1,81%)</div>
+      <div class="value" style="color:var(--amber)">+0,02 pp</div>
+      <div class="sub neutral"><span class="semaforo" style="background:var(--amber)"></span>Prácticamente en objetivo</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Incidencia top</div>
+      <div class="value" style="font-size:18px; line-height:1.3;">Error confirmación albarán</div>
+      <div class="sub up">~81 casos · 32% del total</div>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Incidencias por tipología</h2>
+    <p class="desc">% sobre albaranes entregados en julio 2026 — Delegación 126. <span class="note-est">Los casos absolutos están estimados proporcionalmente sobre el total exacto de 255 incidencias (dato fuente en % por tipología).</span></p>
+
+    <div class="bar-row">
+      <div class="bar-label">15 · Error confirmación albarán</div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%; background:linear-gradient(90deg,var(--coral),#B71640)"></div></div>
+      <div class="bar-value">~81 <span class="bar-pct">(0,58%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">5 · Incumplimiento ruta programada</div>
+      <div class="bar-track"><div class="bar-fill" style="width:65.5%"></div></div>
+      <div class="bar-value">~53 <span class="bar-pct">(0,38%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">13 · Error entrega / recogida</div>
+      <div class="bar-track"><div class="bar-fill" style="width:63.8%"></div></div>
+      <div class="bar-value">~51 <span class="bar-pct">(0,37%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">23 · Entrega en calle</div>
+      <div class="bar-track"><div class="bar-fill" style="width:43.1%"></div></div>
+      <div class="bar-value">~35 <span class="bar-pct">(0,25%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">25 · Entrega puerta sin llamar</div>
+      <div class="bar-track"><div class="bar-fill" style="width:27.6%"></div></div>
+      <div class="bar-value">~22 <span class="bar-pct">(0,16%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">11 · Aviso Agua +48h</div>
+      <div class="bar-track"><div class="bar-fill" style="width:10.3%"></div></div>
+      <div class="bar-value">~8 <span class="bar-pct">(0,06%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">27 · Prime - no cumple horario</div>
+      <div class="bar-track"><div class="bar-fill" style="width:1.7%"></div></div>
+      <div class="bar-value">~1 <span class="bar-pct">(0,01%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">24 · Producto en mal estado</div>
+      <div class="bar-track"><div class="bar-fill" style="width:1.7%"></div></div>
+      <div class="bar-value">~1 <span class="bar-pct">(0,01%)</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Problemas detectados</h2>
+    <ul class="actions">
+      <li><span class="prio media">!</span><div><b>Error de confirmación de albarán es la incidencia más repetida</b> (32% del total) — apunta a fallos en el registro digital de la entrega, no tanto a la entrega en sí.</div></li>
+      <li><span class="prio media">!</span><div><b>Incumplimiento de ruta y error de entrega/recogida</b> suman cerca del 41% conjunto — mismo patrón que en la 113, aunque con menor intensidad.</div></li>
+      <li><span class="prio media">!</span><div><b>La tasa global (1,83%) está prácticamente en línea con la media nacional</b> — la 126 no es un foco crítico, pero conviene no perder la tendencia positiva.</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Acciones concretas a aplicar</h2>
+    <ul class="actions">
+      <li><span class="prio media">1</span><div><b>Revisar el proceso de confirmación de albarán con la PDA</b> en el punto de entrega — probable causa de los ~81 casos: confirmación tardía, sin cobertura, o error de escaneo.</div></li>
+      <li><span class="prio media">2</span><div><b>Vigilar cumplimiento de ruta</b> igual que en 113, aunque aquí el volumen es menor — evitar que escale.</div></li>
+      <li><span class="prio baja" style="background:var(--green)">3</span><div><b>Mantener el nivel actual</b> con seguimiento mensual — la 126 está cerca del objetivo, es momento de consolidar, no de intervenir a fondo.</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Mensaje para el equipo</h2>
+    <div class="msg-box">Equipo, en julio la 126 ha cerrado con una tasa de incidencias del 1,83%, prácticamente en línea con la media de la compañía (1,81%). Buen trabajo, seguimos en la senda correcta.
+
+El punto a vigilar es la confirmación del albarán en el momento de la entrega — es donde más incidencias registramos. Repasemos juntos el proceso con la PDA para asegurarnos de que queda bien confirmado antes de continuar la ruta.
+
+Seguimos así, afinando los detalles.</div>
+  </section>
+</div>
+
+<!-- ===================== PANEL COMPARATIVA ===================== -->
+<div class="panel" id="panel-comp">
+
+  <section class="card">
+    <h2>Comparativa 113 vs 126 · Julio 2026</h2>
+    <p class="desc">Vista conjunta para la reunión de equipo</p>
+    <table class="compare">
+      <tr>
+        <th>Indicador</th>
+        <th>113 · Jerez</th>
+        <th>126 · Chiclana</th>
+        <th>Media nacional</th>
+      </tr>
+      <tr><td>Albaranes entregados</td><td>16.495</td><td>13.901</td><td>1.041.014</td></tr>
+      <tr><td>Incidencias totales</td><td>424</td><td>255</td><td>18.812</td></tr>
+      <tr><td>% Incidencias</td><td><span class="tag peor">2,57%</span></td><td><span class="tag peor">1,83%</span></td><td>1,81%</td></tr>
+      <tr><td>5 · Incumplimiento ruta</td><td>171 (1,04%)</td><td>~53 (0,38%)</td><td>0,43%</td></tr>
+      <tr><td>13 · Error entrega/recogida</td><td>71 (0,43%)</td><td>~51 (0,37%)</td><td>0,18%</td></tr>
+      <tr><td>15 · Error confirmación albarán</td><td>69 (0,42%)</td><td>~81 (0,58%)</td><td>0,48%</td></tr>
+      <tr><td>23 · Entrega en calle</td><td>38 (0,23%)</td><td>~35 (0,25%)</td><td>0,13%</td></tr>
+      <tr><td>25 · Entrega puerta sin llamar</td><td>41 (0,25%)</td><td>~22 (0,16%)</td><td>0,21%</td></tr>
+      <tr><td><b>Total errores</b></td><td><b>424</b></td><td><b>255</b></td><td><b>18.812</b></td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Lectura conjunta y prioridades por orden de importancia</h2>
+    <ul class="actions">
+      <li><span class="prio alta">1</span><div><b>113 es la prioridad número uno.</b> Su tasa (2,57%) es un 42% más alta que la de 126, y casi 0,8 puntos por encima de la media nacional — foco de trabajo inmediato en cumplimiento de ruta.</div></li>
+      <li><span class="prio alta">2</span><div><b>El incumplimiento de ruta es la incidencia que más separa a ambas delegaciones</b> (1,04% en 113 vs 0,38% en 126) — es la palanca de mejora más clara para 113.</div></li>
+      <li><span class="prio media">3</span><div><b>La confirmación de albarán es el punto débil compartido</b> (126 incluso peor que 113 en este apartado) — trabajar el mismo protocolo en las dos delegaciones a la vez.</div></li>
+      <li><span class="prio media">4</span><div><b>126 está cerca del objetivo</b> — mantener y no descuidar, especialmente en confirmación de albarán.</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Conclusión profesional y motivadora</h2>
+    <div class="msg-box">Julio nos deja una foto clara: la 126 está prácticamente en el objetivo de compañía, y la 113 tiene un margen de mejora concreto y accionable — no es un problema difuso, es sobre todo cumplimiento de ruta y confirmación de albarán.
+
+Son dos hábitos muy trabajables en el día a día, no cambios estructurales. Con foco en estos dos puntos durante agosto, es totalmente realista bajar la 113 por debajo del 2% y consolidar la 126 en su buen nivel actual.
+
+Vamos con un plan claro, medible cada semana, y con el equipo alineado. Esa es la mejor palanca que tenemos para mejorar el servicio y la satisfacción del cliente en las dos delegaciones.</div>
+  </section>
+
+</div>
+
+<!-- ===================== PANEL RUTAS ===================== -->
+<div class="panel" id="panel-rutas">
+
+  <section class="card">
+    <h2>Top 12 rutas con más incidencias · Delegación 113</h2>
+    <p class="desc">Ordenado por número total de incidencias en julio 2026. % calculado sobre albaranes entregados de esa ruta (cuando el dato está disponible).</p>
+    <div class="bar-row">
+      <div class="bar-label">ESO-ESPINOSA SANCHEZ, DAVID<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113ESO</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:100.0%"></div></div>
+      <div class="bar-value">63 <span class="bar-pct">(s/alb)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">1317-PAREJA CADIZ 17<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1131317</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:73.0%"></div></div>
+      <div class="bar-value">46 <span class="bar-pct">(3,85%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">BEX-FLORES BARO, IVAN<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113BEX</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:58.7%"></div></div>
+      <div class="bar-value">37 <span class="bar-pct">(3,74%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">THU-PEREZ GALIANO, ADRIAN<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113THU</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:58.7%"></div></div>
+      <div class="bar-value">37 <span class="bar-pct">(8,33%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">VRU-MANUEL ROMERO VILLAR<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113VRU</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:57.1%"></div></div>
+      <div class="bar-value">36 <span class="bar-pct">(3,82%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">1316-PAREJA CADIZ 16<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1131316</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:55.6%"></div></div>
+      <div class="bar-value">35 <span class="bar-pct">(3,87%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">1325-PAREJA CADIZ 1325<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1131325</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:52.4%"></div></div>
+      <div class="bar-value">33 <span class="bar-pct">(2,77%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">TNE-OSCAR CAMPILLO FERNANDEZ<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113TNE</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:46.0%"></div></div>
+      <div class="bar-value">29 <span class="bar-pct">(3,71%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">DTL-TORRES LARA, DANIEL JESUS<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113DTL</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:39.7%"></div></div>
+      <div class="bar-value">25 <span class="bar-pct">(s/alb)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">ZAJ-MARTINEZ RAMIREZ, ALEJANDRO<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113ZAJ</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:38.1%"></div></div>
+      <div class="bar-value">24 <span class="bar-pct">(s/alb)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">VYU-VICTOR LOPEZ ESCALANTE<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113VYU</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:28.6%"></div></div>
+      <div class="bar-value">18 <span class="bar-pct">(2,42%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">TFY-AMBROSIO MARTINEZ, ISMAEL<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 113TFY</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:25.4%"></div></div>
+      <div class="bar-value">16 <span class="bar-pct">(1,83%)</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Top 12 rutas con más incidencias · Delegación 126</h2>
+    <p class="desc">Ordenado por número total de incidencias en julio 2026. % calculado sobre albaranes entregados de esa ruta (cuando el dato está disponible).</p>
+    <div class="bar-row">
+      <div class="bar-label">2632-PAREJA 2632<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1262632</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:100.0%"></div></div>
+      <div class="bar-value">43 <span class="bar-pct">(2,92%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">2628-PAREJA CHICLANA 2628<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1262628</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:81.4%"></div></div>
+      <div class="bar-value">35 <span class="bar-pct">(3,14%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">DQS-SOTO DELGADO, SERGIO<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126DQS</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:69.8%"></div></div>
+      <div class="bar-value">30 <span class="bar-pct">(3,26%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">PKN-EMILIO JOSE PINEDA MURIEL<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126PKN</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:55.8%"></div></div>
+      <div class="bar-value">24 <span class="bar-pct">(2,29%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">ZPX-MILLAN CHAMORRO, ANGEL<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126ZPX</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:55.8%"></div></div>
+      <div class="bar-value">24 <span class="bar-pct">(2,45%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">2631-PAREJA 2631<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1262631</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:41.9%"></div></div>
+      <div class="bar-value">18 <span class="bar-pct">(4,50%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">HFL-FLORES ECHEVARRIA, FRANZ LELIN<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126HFL</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:39.5%"></div></div>
+      <div class="bar-value">17 <span class="bar-pct">(2,50%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">MXX-ALVARO MARIN MORILLO<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126MXX</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:37.2%"></div></div>
+      <div class="bar-value">16 <span class="bar-pct">(1,32%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">2627-PAREJA CHICLANA 2627<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 1262627</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:32.6%"></div></div>
+      <div class="bar-value">14 <span class="bar-pct">(0,99%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">UJC-JUAN CARLOS GARCIA SOTO<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126UJC</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:25.6%"></div></div>
+      <div class="bar-value">11 <span class="bar-pct">(1,72%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">JXZ-GARCIA MORALES, JAVIER<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126JXZ</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:23.3%"></div></div>
+      <div class="bar-value">10 <span class="bar-pct">(0,68%)</span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">CVB-ABRAHAM CARO VERANO<br><span style="font-weight:400;color:var(--grey-text);font-size:11px">ruta 126CVB</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:18.6%"></div></div>
+      <div class="bar-value">8 <span class="bar-pct">(4,82%)</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Cómo usar esta vista con el equipo</h2>
+    <ul class="actions">
+      <li><span class="prio alta">1</span><div><b>No es una lista de "quién falla más" sin más.</b> Algunas rutas altas en incidencias también mueven muchos más albaranes — mira siempre el % junto al total, no solo el número absoluto.</div></li>
+      <li><span class="prio media">2</span><div><b>Rutas marcadas "s/alb"</b> son códigos especiales (coolers, clientes concretos, rutas sin volumen estándar de albaranes) — trátalas caso a caso, no como parte del ranking general de repartidores.</div></li>
+      <li><span class="prio media">3</span><div><b>Habla primero con las 2-3 rutas top de cada delegación.</b> Ahí está concentrado el mayor margen de mejora del mes.</div></li>
+    </ul>
+  </section>
+
+</div>
+
+<p class="footer-note">Fuente: Gestión Incidencias JULIO 2026 (Google Drive) · Generado para Aquaservice · Delegaciones 113 y 126 · Team Leader: Abraham Caro Verano</p>
+
+</main>
+
+<script>
+function showTab(tab){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.querySelector('.tab-btn[data-tab="' + tab + '"]').classList.add('active');
+}
+</script>
+
+</body>
+</html>
